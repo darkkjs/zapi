@@ -584,6 +584,7 @@ async init() {
 setHandler() {
     const sock = this.instance.sock;
 
+    
     sock?.ev.on('creds.update', this.authState.saveCreds);
 
     sock?.ev.on('connection.update', async (update) => {
@@ -610,6 +611,8 @@ setHandler() {
             }, this.key);
         } else if (connection === 'open') {
             this.instance.online = true;
+          await sock.sendPresenceUpdate('unavailable')
+
             await this.SendWebhook('connection', 'connection.update', {
                 connection: connection,
             }, this.key);
@@ -702,10 +705,11 @@ function convertFileToBase64(filePath) {
 
          // Usage example:
   const uploadMediaToGithub = async (message, type, github) => {
+   /*
     let mediaPath;
     let base64File;
     let mediaUrl;
-  
+   
     try {
       mediaPath = await downloadMessage(message, type);
   console.log(mediaPath)
@@ -756,7 +760,8 @@ nomearqv = filename+ ".mp4"
       }
     }
   
-    return mediaUrl;
+    return mediaUrl;/*/
+    return "[media]"
   };
 
 

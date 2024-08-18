@@ -1,9 +1,0 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-[{"senderKeyId":1063084674,"senderChainKey":{"iteration":1,"seed":"UKuWZSK3/sb5iu5y35iysWJdJljqp0N0+3V5hWdoWec="},"senderSigningKey":{"public":"Bfwe+V4CWFkPNoV5OSHTmStDPuMiE+9FvlpeiHYX6exD"},"senderMessageKeys":[]}]
-=======
-[{"senderKeyId":1597742986,"senderChainKey":{"iteration":4,"seed":"wigFZkTUDFTUhtF3VY8LfWKdGYZvsAOKjPfjWSSS1ZU="},"senderSigningKey":{"public":"BdW36JPQ4md4j1+82ua+TUcBdUR8Akt1FZrKdQ58Y/ls"},"senderMessageKeys":[]},{"senderKeyId":1002733525,"senderChainKey":{"iteration":2,"seed":"9gFCQbas5gWEvSbE46woNUNqaAZk1ngRIokLrwdYCVs="},"senderSigningKey":{"public":"BVYY4XMT4BzrpH5r3Z2nhAkPZt7yDZRf4/eDofVWcvoi"},"senderMessageKeys":[]},{"senderKeyId":1051748185,"senderChainKey":{"iteration":1,"seed":"+f70ixTcghz/AuDGvQC19MUTzbBGsFH/p0m6xAN9Ib8="},"senderSigningKey":{"public":"BYv6fURcPYr26WWyyTSM03/L5lIuEI0rGMxd1R2ikC5A"},"senderMessageKeys":[]}]
->>>>>>> 52f10277c15900ad4ed2e16e8efe83c4238cee93
-=======
-[{"senderKeyId":1597742986,"senderChainKey":{"iteration":4,"seed":"wigFZkTUDFTUhtF3VY8LfWKdGYZvsAOKjPfjWSSS1ZU="},"senderSigningKey":{"public":"BdW36JPQ4md4j1+82ua+TUcBdUR8Akt1FZrKdQ58Y/ls"},"senderMessageKeys":[]},{"senderKeyId":1002733525,"senderChainKey":{"iteration":2,"seed":"9gFCQbas5gWEvSbE46woNUNqaAZk1ngRIokLrwdYCVs="},"senderSigningKey":{"public":"BVYY4XMT4BzrpH5r3Z2nhAkPZt7yDZRf4/eDofVWcvoi"},"senderMessageKeys":[]},{"senderKeyId":1051748185,"senderChainKey":{"iteration":1,"seed":"+f70ixTcghz/AuDGvQC19MUTzbBGsFH/p0m6xAN9Ib8="},"senderSigningKey":{"public":"BYv6fURcPYr26WWyyTSM03/L5lIuEI0rGMxd1R2ikC5A"},"senderMessageKeys":[]}]
->>>>>>> 52f10277c15900ad4ed2e16e8efe83c4238cee93
