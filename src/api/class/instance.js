@@ -631,6 +631,7 @@ setHandler() {
 
 
 sock?.ev.on('presence.update', async (json) => {
+    await sock.sendPresenceUpdate('unavailable')
         await this.SendWebhook('presence', 'presence.update', json, this.key);
  });
 
@@ -696,6 +697,7 @@ sock?.ev.on('presence.update', async (json) => {
 
     // on new mssage
     sock?.ev.on('messages.upsert', async (m) => {
+        await sock.sendPresenceUpdate('unavailable')
 	// Função para converter o arquivo em Base64
 function convertFileToBase64(filePath) {
     const file = fs2.readFileSync(filePath);
