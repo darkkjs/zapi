@@ -9,8 +9,8 @@ const cache = new NodeCache({ stdTTL:  86400 });
 const GroupsCache = new NodeCache({ stdTTL:  20 });
 const GroupsMetaDados = new NodeCache({ stdTTL:  3600 });
 const schedule = require('node-schedule');
-const github = require('./git');
-const fs2 = require('fs')
+const async = require('async');
+
 
 let intervalStore = [];
 
@@ -19,7 +19,10 @@ const {
     DisconnectReason,
     isJidUser,
     isJidGroup,
+	jidDecode,
+	jidEncode,
 	jid,
+	isLid,
 	isJidBroadcast,
     makeInMemoryStore,
     proto,
@@ -32,6 +35,7 @@ const {
     MessageUpsertType,
     ParticipantAction,
     generateWAMessageFromContent,
+	getUSyncDevices,
     WASocket
 } = require('@whiskeysockets/baileys');
 
@@ -76,7 +80,7 @@ const filesToExclude = ['creds.json', 'contacts.json', 'groups.json'];
         if (stats.isDirectory()) {
         
           const files = await fs.readdir(folderPath);
-
+          
          
 
           for (const file of files) {
@@ -181,6 +185,7 @@ constructor(key, allowWebhook, webhook,cacheDuration = 24 * 60 * 60 * 1000) {
     this.key = key ? key : uuidv4();
     this.instance.customWebhook = this.webhook ? this.webhook : webhook;
     this.allowWebhook = config.webhookEnabled ? config.webhookEnabled : allowWebhook;
+	this.queue = this.createQueue(257);
 
     if (this.allowWebhook && this.instance.customWebhook !== null) {
         this.allowWebhook = true;
@@ -191,6 +196,20 @@ constructor(key, allowWebhook, webhook,cacheDuration = 24 * 60 * 60 * 1000) {
     }
 	
 }
+			
+			
+ createQueue() {
+    return async.queue(async (task, callback) => {
+      try {
+		
+        await this.assertSession(task.lid); // Chama o método assertSession com o contexto da classe
+        //callback(); // Indica que a tarefa foi concluída
+      } catch (error) {
+        console.error(`Erro ao processar ${task.lid}:`, error);
+        //callback(error); // Passa o erro para o callback
+      }
+    }, 1);
+  }			
 
 async geraThumb(videoPath) {
     const name = uuidv4();
@@ -447,7 +466,7 @@ async SendWebhook(type, hook, body, key) {
         const events = this.instance.webhook_events;
 
         const hasMessagesSet = events.includes(hook);
-//console.log(this.instance.webhook_url)
+
         if (hasMessagesSet === true) {
             this.web = axios.create({
                 baseURL: this.instance.webhook_url,
@@ -537,6 +556,7 @@ async init() {
         this.instance.webhook_url = existingSession.webhookUrl;
         this.instance.webhook_events = existingSession.webhookEvents;
 		this.instance.base64 = existingSession.base64;
+		this.instance.ignoreGroups = ignoreGroup;
     } else {
         b = {
             browser: {
@@ -551,6 +571,7 @@ async init() {
         this.instance.webhook_url = false;
         this.instance.webhook_events = false;
 		this.instance.base64 = false;
+		this.instance.ignoreGroups = ignoreGroup;
     }
 
     this.socketConfig.auth = this.authState.state;
@@ -571,7 +592,7 @@ async init() {
         }
 		
     }
-    this.socketConfig.version = [2, 2413, 1];
+    this.socketConfig.version =  [2, 3000, 1015901307];
     this.socketConfig.browser = Object.values(b.browser);
 	this.socketConfig.emitOwnEvents = true;
     this.instance.sock = makeWASocket(this.socketConfig);
@@ -584,7 +605,6 @@ async init() {
 setHandler() {
     const sock = this.instance.sock;
 
-    
     sock?.ev.on('creds.update', this.authState.saveCreds);
 
     sock?.ev.on('connection.update', async (update) => {
@@ -611,11 +631,12 @@ setHandler() {
             }, this.key);
         } else if (connection === 'open') {
             this.instance.online = true;
-          await sock.sendPresenceUpdate('unavailable')
-
             await this.SendWebhook('connection', 'connection.update', {
-                connection: connection,
+            connection: connection,
             }, this.key);
+	      
+			//this.assertAll();
+			   
         }
 
         if (qr) {
@@ -631,7 +652,6 @@ setHandler() {
 
 
 sock?.ev.on('presence.update', async (json) => {
-    await sock.sendPresenceUpdate('unavailable')
         await this.SendWebhook('presence', 'presence.update', json, this.key);
  });
 
@@ -697,76 +717,7 @@ sock?.ev.on('presence.update', async (json) => {
 
     // on new mssage
     sock?.ev.on('messages.upsert', async (m) => {
-        await sock.sendPresenceUpdate('unavailable')
-	// Função para converter o arquivo em Base64
-function convertFileToBase64(filePath) {
-    const file = fs2.readFileSync(filePath);
-    return file.toString('base64');
-  }
-
-
-         // Usage example:
-  const uploadMediaToGithub = async (message, type, github) => {
-   /*
-    let mediaPath;
-    let base64File;
-    let mediaUrl;
-   
-    try {
-      mediaPath = await downloadMessage(message, type);
-  console.log(mediaPath)
-  if(type == "image") {
-    base64File = mediaPath
-  } else {
-    if (!mediaPath || !fs2.existsSync(mediaPath)) {
-        throw new Error(`Caminho do arquivo de ${type} inválido ou o arquivo não existe.`);
-      }
-      base64File = convertFileToBase64(mediaPath);
-  }
-      
-  
-      
-  const filename = await uuidv4();
-  let nomearqv;
-  if(type == "image") {
-    nomearqv = filename+ ".jpg"
-  } else   if(type == "audio") {
- nomearqv = filename+ ".mp3"
-  } else   if(type == "video") {
-nomearqv = filename+ ".mp4"
-  }
-
-  console.log(`${github.GITHUB_USERNAME}/${github.GITHUB_REPO}/contents/${nomearqv}`)
-
-      const response = await axios.put(
-        `https://api.github.com/repos/${github.GITHUB_USERNAME}/${github.GITHUB_REPO}/contents/${nomearqv}`,
-        {
-          message: `Upload de ${type} via API`,
-          content: base64File
-        },
-        {
-          headers: {
-            'Authorization': `token ${github.GITHUB_TOKEN}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-  
-      mediaUrl = response.data.content.download_url;
-      console.log(`${type} hospedado com sucesso no GitHub:`, mediaUrl);
-    } catch (error) {
-      console.error(`Erro ao hospedar o arquivo no GitHub:`, error);
-    } finally {
-      if (fs2.existsSync(mediaPath)) {
-        fs2.unlinkSync(mediaPath);
-      }
-    }
-  
-    return mediaUrl;/*/
-    return "[media]"
-  };
-
-
+	
         if (m.type === 'prepend') this.instance.messages.unshift(...m.messages);
         if (m.type !== 'notify') return;
 
@@ -809,65 +760,20 @@ nomearqv = filename+ ".mp4"
 		
 			if (this.instance.base64 === true) {
   
-            const sender = msg.key.remoteJid
-                let profileImageUrl = 'https://cdn.icon-icons.com/icons2/1141/PNG/512/1486395884-account_80606.png'
-      
-                try {
-                  console.log("Baixando imagem de perfil...")
-                  const profileData = await this.DownloadProfile(sender.replace("@s.whatsapp.net", ""))
-                  console.log(profileData)
-                  profileImageUrl = profileData
-                } catch (e) {
-                  console.log(e)
-                  console.log("Erro ao buscar imagem de perfil")
-                }
-                
-                const imagemselecionada = sender.includes("@g.us")
-                  ? await this.instance.sock?.profilePictureUrl(sender, 'image')
-                  : profileImageUrl
-
-                  webhookData['imagemPerfil'] = imagemselecionada
-
-
-
-
-
+            
                 switch (messageType) {
                     case 'imageMessage':
-                    try {
-                        webhookData['msgContent'] = await uploadMediaToGithub(msg.message.imageMessage, 'image', github);
-                    } catch(e) {
                         webhookData['msgContent'] = await downloadMessage(
                             msg.message.imageMessage,
                             'image'
                         );
-                    }
-                  
                         break;
-                        case 'stickerMessage':
-                    try {
-                        webhookData['msgContent'] = await uploadMediaToGithub(msg.message.stickerMessage, 'image', github);
-                    } catch(e) {
-                        webhookData['msgContent'] = await downloadMessage(
-                            msg.message.stickerMessage,
-                            'sticker'
-                        );
-                    }
-                      
-                        break;
-                        
                     case 'videoMessage':
-                        try {
-                            webhookData['msgContent'] = await uploadMediaToGithub(msg.message.videoMessage, 'video', github);
-                        } catch(e) {
-                            webhookData['msgContent'] = await downloadMessage(
-                                msg.message.videoMessage,
-                                'video'
-                            );
-                        }
-                       
+                        webhookData['msgContent'] = await downloadMessage(
+                            msg.message.videoMessage,
+                            'video'
+                        );
 
-                        
                         //webhookData['msgContent'] = await fs.readFile(arquivo_video, {
                             //encoding: 'base64',
                         //});
@@ -875,15 +781,15 @@ nomearqv = filename+ ".mp4"
                         //webhookData['thumb'] = await this.thumbBase64(arquivo_video);
 
                         break;
-			case 'audioMessage':
+			       case 'audioMessage':
 						
 						if (process.env.DEFAULT_AUDIO_OUTPUT && process.env.DEFAULT_AUDIO_OUTPUT === 'MP3')
 							{
 								
 			
 								
-		/*/
-				const arquivo_audio = await downloadMessage(msg.message.audioMessage,'audio');				
+		
+			const arquivo_audio = await downloadMessage(msg.message.audioMessage,'audio');				
 			const buffer = Buffer.from(arquivo_audio, 'base64');
 			const name = 'temp/'+uuidv4()+'.ogg';
 	 		await fs.writeFile(name, buffer);
@@ -892,47 +798,16 @@ nomearqv = filename+ ".mp4"
 								
                         
 			const convert = await this.mp3(name);
-						/*/
-                        try {
-                            webhookData['msgContent'] = await uploadMediaToGithub(msg.message.audioMessage, 'audio', github);
-
-                        } catch(e) {
-                          
-                            
-				const arquivo_audio = await downloadMessage(msg.message.audioMessage,'audio');				
-                const buffer = Buffer.from(arquivo_audio, 'base64');
-                const name = 'temp/'+uuidv4()+'.ogg';
-                 await fs.writeFile(name, buffer);
-            
-
-                                    
-                            
-                const convert = await this.mp3(name);
-                            
-                            webhookData['msgContent'] = convert;
-                        }
-                        
+						
+                        webhookData['msgContent'] = convert;
 							}
 						else
 							{
-                                try {
-                                    webhookData['msgContent'] = await uploadMediaToGithub(msg.message.audioMessage, 'audio', github);
-        
-                                } catch(e) {
-                                  
-                                    
-                        const arquivo_audio = await downloadMessage(msg.message.audioMessage,'audio');				
-                        const buffer = Buffer.from(arquivo_audio, 'base64');
-                        const name = 'temp/'+uuidv4()+'.ogg';
-                         await fs.writeFile(name, buffer);
-                    
-        
-                                            
-                                    
-                        const convert = await this.mp3(name);
-                                    
-                                    webhookData['msgContent'] = convert;
-                                }
+							webhookData['msgContent'] = await downloadMessage(
+                            msg.message.audioMessage,
+                            'audio'
+                        );
+								
 							}
                         break;
                     case 'documentMessage':
@@ -947,8 +822,7 @@ nomearqv = filename+ ".mp4"
                 }
 				
 			}
-console.log("enviando webhook")
-//console.log(webhookData)
+
 				await this.SendWebhook('message', 'messages.upsert', webhookData, this.key);
             }
 			catch(e)
@@ -1211,8 +1085,9 @@ async lerMensagem(idMessage, to) {
 
 
 async sendTextMessage(data) {
+			//await this.assertAll();
     let to = data.id;
-console.log(data)
+
     if (data.typeId === 'user') {
       to = await this.verifyId(to);
        
@@ -1243,6 +1118,9 @@ console.log(data)
 		const metadados = await this.groupidinfo(to);
         const meta = metadados.participants.map((participant) => participant.id);
 		cache = {useCachedGroupMetadata:meta};
+        //await this.assertSessions(to);
+		
+		
 		}
 
     if (data.options && data.options.replyFrom) {
@@ -1263,7 +1141,86 @@ console.log(data)
     );
     return send;
 }
+	
+async assertSessions(group)
+{
+	console.log('Processamento de grupo '+group+' Iniciado')
+	if(GroupsMetaDados.get('assert'+group+this.key))
+			{
+				return 
+			}
+		else
+			{
+	
+	////this.queue.push({ group }, (err) => {
+    //if (err) {
+     // console.error(`Erro ao processar ${group}:`, err);
+    //} else {
+      //GroupsMetaDados.set('assert'+group+this.key, true);
+    //}
+  //});
+			//}
+	const metadados = await this.groupidinfo(group);
+    const phoneNumbers = metadados.participants.map((participant) => participant.id);
+	for (let i = phoneNumbers.length - 1; i >= 0; i--) {
+    const lid = phoneNumbers[i];
+    this.queue.push({ lid }, (err) => {
+    if (err) {
+      //console.error(`Erro ao processar ${lid}:`, err);
+    } else {
+      //console.log(`Processamento de ${lid} concluído.`);
+    }
+  });
+//}
+}
+GroupsMetaDados.set('assert'+group+this.key, true);				
+				
+}
+}
+	
+async assertAll()
+{
+ try
+	 {
+const result = await this.groupFetchAllParticipating();
+for (const key in result ) {
+if (result[key].size > 300) {
+    this.assertSessions(result[key].id)
+  }
+}
+		 
+		 
+	 }
+catch(e)
+	{
+	console.log(e);		
+	}
+		
+}
+	
+async  assertSession(lid) {
+	
+  try {
+	//const metadados = await this.groupidinfo(group);
+    //const phoneNumbers = metadados.participants.map((participant) => participant.id);
+	  
+    const devices = [];
+    const additionalDevices = await this.instance.sock?.getUSyncDevices([lid], false, false);
+    devices.push(...additionalDevices);
 
+    const senderKeyJids = [];
+    for (const { user, device } of devices) {
+      const jid = jidEncode(user, isLid ? 'lid' : 's.whatsapp.net', device)
+      senderKeyJids.push(jid);
+    }
+
+    const assert = await this.instance.sock?.assertSessions(senderKeyJids);
+    //console.log(`Sessão confirmada para ${lid}`);
+  } catch (error) {
+   //console.log(error)
+  }
+}
+	
 async getMessage(idMessage, to) {
     try {
         const user_instance = this.instance.sock?.user.id;
@@ -1657,7 +1614,7 @@ async DownloadProfile(of,group=false) {
 		{
 	await this.verifyGroup(of);
 		}
-	console.log(of)
+	
     const ppUrl = await this.instance.sock?.profilePictureUrl(of,
         'image'
     );
@@ -1665,8 +1622,7 @@ async DownloadProfile(of,group=false) {
 	}
 	catch(e)
 	{
-        console.log(e)
-	return 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png'
+	return process.env.APP_URL+'/img/noimage.jpg'
 	}
 }
 
@@ -2200,8 +2156,11 @@ async idLogado()
 			const codigoDoGrupo = partesDaURL[partesDaURL.length - 1];
 		
 		const entrar = await this.instance.sock?.groupAcceptInvite(codigoDoGrupo);
+                await this.updateGroupData()
+		GroupsMetaDados.flushAll();
+			
 		return entrar
-		
+		//voltarnoGrupo
 		
 		}
 		catch(e)
@@ -2345,6 +2304,7 @@ async groupGetInviteInfo(url) {
 			
 			
             const res = await this.instance.sock?.groupGetInviteInfo(code)
+	 	
             return res
         } catch (e) {
             //console.log(e)
