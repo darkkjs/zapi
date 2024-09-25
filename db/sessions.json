@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "key": "inst_6ifvlk1k5",
+    "ignoreGroups": false,
+    "webhook": true,
+    "base64": true,
+    "webhookUrl": "http://localhost:3332/webhook/inst_6ifvlk1k5",
+    "browser": "Ubuntu",
+    "webhookEvents": [
+      "messages.upsert"
+    ],
+    "messagesRead": false
+  },
+  {
+    "key": "inst_ehzc9ux9y",
+    "ignoreGroups": false,
+    "webhook": true,
+    "base64": true,
+    "webhookUrl": "http://localhost:3332/webhook/inst_ehzc9ux9y",
+    "browser": "Ubuntu",
+    "webhookEvents": [
+      "messages.upsert"
+    ],
+    "messagesRead": false
+  },
+  {
+    "key": "inst_nuktl1lpv",
+    "ignoreGroups": false,
+    "webhook": true,
+    "base64": true,
+    "webhookUrl": "http://localhost:3332/webhook/inst_nuktl1lpv",
+    "browser": "Ubuntu",
+    "webhookEvents": [
+      "messages.upsert"
+    ],
+    "messagesRead": false
+  },
+  {
+    "key": "inst_18w8afano",
+    "ignoreGroups": false,
+    "webhook": true,
+    "base64": true,
+    "webhookUrl": "http://localhost:3332/webhook/inst_18w8afano",
+    "browser": "Ubuntu",
+    "webhookEvents": [
+      "messages.upsert"
+    ],
+    "messagesRead": false
+  },
+  {
+    "key": "inst_gf8sgdzsa",
+    "ignoreGroups": false,
+    "webhook": true,
+    "base64": true,
+    "webhookUrl": "http://localhost:3332/webhook/inst_gf8sgdzsa",
+    "browser": "Ubuntu",
+    "webhookEvents": [
+      "messages.upsert"
+    ],
+    "messagesRead": false
+  }
+]
