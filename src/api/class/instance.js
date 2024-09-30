@@ -631,6 +631,7 @@ setHandler() {
             }, this.key);
         } else if (connection === 'open') {
             this.instance.online = true;
+            await this.instance.sock?.sendPresenceUpdate('unavailable')
             await this.SendWebhook('connection', 'connection.update', {
             connection: connection,
             }, this.key);
@@ -873,40 +874,125 @@ sock?.ev.on('presence.update', async (json) => {
 
     sock?.ev.on('groups.upsert', async (groupUpsert) => {
 	
+        console.log("Received groups.upsert event:", JSON.stringify(groupUpsert));
+    
         try {
-            await this.SendWebhook('updateGroups', 'groups.upsert', {
-                data: groupUpsert,
-            }, this.key);
-			await this.updateGroupData()
-			GroupsMetaDados.flushAll();
+            if (this.instance.webhook && this.instance.customWebhook) {
+                const webhookData = {
+                    type: 'updateGroups',
+                    body: {
+                        data: groupUpsert,
+                    },
+                    instanceKey: this.key
+                };
+    
+                console.log("Attempting to send groups.upsert webhook:", JSON.stringify(webhookData));
+    
+                try {
+                    const response = await this.axiosInstance.post('', webhookData);
+                    console.log("groups.upsert webhook response:", response.data);
+                } catch (error) {
+                    console.error("Error sending groups.upsert webhook:", error.message);
+                    if (error.response) {
+                        console.error("Response data:", error.response.data);
+                        console.error("Response status:", error.response.status);
+                    }
+                }
+            } else {
+                console.log("Webhook is not enabled or URL is not set for groups.upsert");
+            }
+    
+            await this.updateGroupData();
+            GroupsMetaDados.flushAll();
         } catch (e) {
-            return;
+            console.error("Error in groups.upsert handler:", e);
         }
     });
 
     sock?.ev.on('groups.update', async (groupUpdate) => {
 	
+      //  console.log("Received groups.update event:", JSON.stringify(groupUpdate));
+    
         try {
-            await this.SendWebhook('updateGroups', 'groups.update', {
-                data: groupUpdate,
-            }, this.key);
-			await this.updateGroupData()
-			GroupsMetaDados.flushAll();
+            if (this.instance.webhook && this.instance.customWebhook) {
+                const webhookData = {
+                    type: 'updateGroups',
+                    body: {
+                        data: groupUpdate,
+                    },
+                    instanceKey: this.key
+                };
+    
+                console.log("Attempting to send groups.update webhook:", JSON.stringify(webhookData));
+    
+                try {
+                    const response = await this.axiosInstance.post('', webhookData);
+                    console.log("groups.update webhook response:", response.data);
+                } catch (error) {
+                    console.error("Error sending groups.update webhook:", error.message);
+                    if (error.response) {
+                        console.error("Response data:", error.response.data);
+                        console.error("Response status:", error.response.status);
+                    }
+                }
+            } else {
+                console.log("Webhook is not enabled or URL is not set for groups.update");
+            }
+    
+            await this.updateGroupData();
+            GroupsMetaDados.flushAll();
         } catch (e) {
-            return;
+            console.error("Error in groups.update handler:", e);
         }
     });
 
     sock?.ev.on('group-participants.update', async (groupParticipants) => {
 	
         try {
-            await this.SendWebhook('group-participants', 'group-participants.update', {
-                data: groupParticipants,
-            }, this.key);
-			await this.updateGroupData()
-			GroupsMetaDados.flushAll();
+
+            console.log(`Ação do evento: ${groupParticipants.action}`);
+            console.log(`ID do grupo: ${groupParticipants.id}`);
+            
+            if (groupParticipants.action === 'add') {
+                console.log(`Novo(s) membro(s) adicionado(s) ao grupo ${groupParticipants.id}:`);
+                groupParticipants.participants.forEach(participant => {
+                    console.log(`- ${participant}`);
+                });
+            }
+
+            console.log("Received group-participants.update event:", JSON.stringify(groupParticipants));
+    
+           
+
+            if (this.instance.webhook && this.instance.customWebhook) {
+                const webhookData = {
+                    type: 'group-participants',
+                    body: {
+                        data: groupParticipants,
+                    },
+                    instanceKey: this.key
+                };
+    
+                console.log("Attempting to send webhook:", JSON.stringify(webhookData));
+    
+                try {
+                    const response = await this.axiosInstance.post('', webhookData);
+                    console.log("Webhook response:", response.data);
+                } catch (error) {
+                    console.error("Error sending webhook:", error.message);
+                    if (error.response) {
+                        console.error("Response data:", error.response.data);
+                        console.error("Response status:", error.response.status);
+                    }
+                }
+            } else {
+                console.log("Webhook is not enabled or URL is not set");
+            }
+    
+            await this.updateGroupData();
+            GroupsMetaDados.flushAll();
         } catch (e) {
-            return;
+            console.error("Error in group-participants.update handler:", e);
         }
     });
 }
