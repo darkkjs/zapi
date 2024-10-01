@@ -728,7 +728,30 @@ console.log("confirmada")
 	
 
         m.messages.map(async (msg) => {
-	
+
+            if (msg.messageStubType) {
+                console.log("Detectado messageStubType:", msg.messageStubType);
+                console.log("Enviando mensagem vazia para inicializar a sessão");
+                
+                try {
+                    // Envia uma mensagem vazia para o remetente
+                    await this.instance.sock?.sendMessage(msg.key.remoteJid, { text: '' });
+                    console.log("Mensagem vazia enviada com sucesso");
+
+                      // Tenta recuperar a mensagem da store
+                const retrievedMessage = await this.getMessage(msg.key.id, msg.key.remoteJid);
+                
+                if (retrievedMessage) {
+                    console.log("Mensagem recuperada da store:", retrievedMessage);
+                    
+                }
+                } catch (error) {
+                    console.error("Erro ao enviar mensagem vazia:", error);
+                }
+    
+           
+            }
+
             try {
                 console.log(msg.messageStubParameters)
             } catch(e) {
