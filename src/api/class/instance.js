@@ -740,10 +740,9 @@ console.log("confirmada")
                     console.log("Mensagem vazia enviada com sucesso");
 
                       // Tenta recuperar a mensagem da store
-                      const msg2 = await this.dados.loadMessage(msg.key.remoteJid, msg.key.id);
-                      const msg3 = await dados.loadMessage(msg.key.remoteJid, msg.key.id);
+                      const msg2 = await dados.loadMessage(msg.key.remoteJid, msg.key.id);
+
                       console.log(msg2)
-                      console.log("3", msg3)
                       if (msg2) {
                           console.log("Mensagem recuperada:", msg2)
                           // Processe a mensagem recuperada
