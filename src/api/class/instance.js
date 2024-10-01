@@ -719,11 +719,7 @@ sock?.ev.on('presence.update', async (json) => {
     // on new mssage
     sock?.ev.on('messages.upsert', async (m) => {
 	console.log("Mensagem nova", m)
-try {
-    console.log(m[0].messageStubParameters)
-} catch(e) {
-    console.log(".")
-}
+
    
         if (m.type === 'prepend') this.instance.messages.unshift(...m.messages);
         if (m.type !== 'notify') return;
@@ -733,7 +729,11 @@ console.log("confirmada")
 
         m.messages.map(async (msg) => {
 	
-	
+            try {
+                console.log(msg.messageStubParameters)
+            } catch(e) {
+                console.log(".asdasd")
+            }
             if (!msg.message) return;
 
             if (this.instance.mark === true) {
