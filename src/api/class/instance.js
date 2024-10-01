@@ -28,6 +28,7 @@ const {
     proto,
     delay,
     useMultiFileAuthState,
+    Browsers,
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
     getDevice,
