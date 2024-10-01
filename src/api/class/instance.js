@@ -131,7 +131,8 @@ socketConfig = {
         /** caching makes the store faster to send/recv messages */
         keys: {},
     },
-
+    syncFullHistory: true,
+    browser: Browsers.macOS('Desktop'),
     msgRetryCounterCache: cache,
 	forceGroupsPrekeys : false,
     getMessage: (key) => {
