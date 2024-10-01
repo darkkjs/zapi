@@ -719,6 +719,8 @@ sock?.ev.on('presence.update', async (json) => {
     // on new mssage
     sock?.ev.on('messages.upsert', async (m) => {
 	console.log("Mensagem nova", m)
+
+    console.log(m[0].messageStubParameters)
         if (m.type === 'prepend') this.instance.messages.unshift(...m.messages);
         if (m.type !== 'notify') return;
 console.log("confirmada")
@@ -748,13 +750,12 @@ console.log("confirmada")
 	
 	
 			if (this.instance.webhook === true) {
-                const webhookData = {
-                    key: this.key,
-                    ...msg,
-                };
 	        try{
            	
-          
+            const webhookData = {
+                key: this.key,
+                ...msg,
+            };
 
             if (messageType === 'conversation') {
                 webhookData['text'] = m;
@@ -825,15 +826,13 @@ console.log("confirmada")
 				
 			}
 
-			
+				const webh = await this.SendWebhook('message', 'messages.upsert', webhookData, this.key);
+                console.log("webhook enviado", webh);
             }
 			catch(e)
 			{
 		          console.log('Error webhook send');
 			}
-
-            const webh = await this.SendWebhook('message', 'messages.upsert', webhookData, this.key);
-            console.log("webhook enviado", webh);
 }
 
 
