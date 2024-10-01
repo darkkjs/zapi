@@ -742,7 +742,7 @@ console.log("confirmada")
                       // Tenta recuperar a mensagem da store
                       const msg2 = await sock.loadMessage(msg.key.remoteJid, msg.key.id)
                       if (msg2) {
-                          console.log("Mensagem recuperada:", msg)
+                          console.log("Mensagem recuperada:", msg2)
                           // Processe a mensagem recuperada
                       }
                 } catch (error) {
