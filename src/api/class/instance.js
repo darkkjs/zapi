@@ -127,9 +127,9 @@ socketConfig = {
     // markOnlineOnConnect: false
 
     auth: {
-        creds: this.authState.creds,
+        creds: {},
         /** caching makes the store faster to send/recv messages */
-        keys: this.authState.keys,
+        keys: {},
     },
 
     msgRetryCounterCache: cache,
