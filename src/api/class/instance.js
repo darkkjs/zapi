@@ -125,6 +125,13 @@ socketConfig = {
 	
 
     // markOnlineOnConnect: false
+
+    auth: {
+        creds: this.authState.creds,
+        /** caching makes the store faster to send/recv messages */
+        keys: this.authState.keys,
+    },
+
     msgRetryCounterCache: cache,
 	forceGroupsPrekeys : false,
     getMessage: (key) => {
@@ -631,7 +638,7 @@ setHandler() {
             }, this.key);
         } else if (connection === 'open') {
             this.instance.online = true;
-         //   await this.instance.sock?.sendPresenceUpdate('unavailable')
+      await this.instance.sock?.sendPresenceUpdate('unavailable')
             await this.SendWebhook('connection', 'connection.update', {
             connection: connection,
             }, this.key);
