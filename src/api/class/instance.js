@@ -110,7 +110,7 @@ const filesToExclude = ['creds.json', 'contacts.json', 'groups.json'];
 }
 
 
-const job = schedule.scheduleJob('0 3 * * *', clear);
+//const job = schedule.scheduleJob('0 3 * * *', clear);
 
 
 
