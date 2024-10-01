@@ -2,7 +2,7 @@
     "name": "whatsapp-hard-api-nodejs",
     "version": "1.0",
     "description": "Whatsapp api rest multidevices baseada em baileys",
-    "main": "server.js",
+    "main": "src/server.js",
     "scripts": {
         "start": "node src/server.js",
         "dev": "nodemon",
@@ -35,8 +35,8 @@
         "@adiwajshing/keyed-db": "^0.2.4",
         "@ffmpeg-installer/ffmpeg": "^1.1.0",
         "@whiskeysockets/baileys": "github:WhiskeySockets/Baileys",
+        "async": "^3.2.6",
         "axios": "^1.1.3",
-        "baileys": "github:WhiskeySockets/Baileys",
         "connect-flash": "^0.1.1",
         "cookie-parser": "^1.4.6",
         "dotenv": "^16.0.3",

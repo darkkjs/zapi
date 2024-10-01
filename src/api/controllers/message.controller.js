@@ -178,6 +178,12 @@ exports.Read = async (req, res) => {
     return res.status(201).json({ error: false, data: data })
 }
 
+exports.getLastSeen = async (req, res) => {
+    const data = await WhatsAppInstances[req.query.key].getLastSeen(req.body.id)
+    return res.status(201).json({ error: false, data: data })
+}
+
+
 exports.React = async (req, res) => {
     const data = await WhatsAppInstances[req.query.key].reactMessage(req.body.id, req.body.key, req.body.emoji)
     return res.status(201).json({ error: false, data: data })

@@ -809,6 +809,12 @@ console.log("confirmada")
                             'image'
                         );
                         break;
+                        case 'stickerMessage':
+                            webhookData['msgContent'] = await downloadMessage(
+                                msg.message.stickerMessage,
+                                'image'
+                            );
+                            break;
                     case 'videoMessage':
                         webhookData['msgContent'] = await downloadMessage(
                             msg.message.videoMessage,
@@ -1911,6 +1917,58 @@ async createJid(number) {
         return jid;
     } else {
         return number;
+    }
+}
+
+
+
+async getLastSeen(to) {
+    try {
+        to = await this.verifyId(to);
+        let attempts;
+        for (let i = 0; i <  attempts; i++) {
+          // Inscreve-se para receber atualizações de presença
+          await this.instance.sock?.presenceSubscribe(to);
+          
+          const presenceData = await new Promise((resolve) => {
+            const presenceHandler = (presence) => {
+              if (presence.id === to) {
+                this.instance.sock?.ev.off('presence.update', presenceHandler);
+                resolve(presence);
+              }
+            };
+            
+            this.instance.sock?.ev.on('presence.update', presenceHandler);
+            
+            // Define um timeout para a resposta
+            setTimeout(() => {
+              this.instance.sock?.ev.off('presence.update', presenceHandler);
+              resolve(null);
+            }, 3000); // 3 segundos de timeout
+          });
+          
+          if (presenceData) {
+            return {
+              error: false,
+              online: presenceData.presences?.[to]?.lastKnownPresence === 'available'
+            };
+          }
+          
+          // Espera um pouco antes de tentar novamente
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        // Se chegou aqui, não conseguiu obter a presença após várias tentativas
+        return {
+          error: true,
+          message: 'Não foi possível determinar o status online'
+        };
+      } catch (error) {
+        console.error('Erro ao verificar status online:', error);
+        return {
+          error: true,
+          message: 'Erro ao verificar status online'
+        }
     }
 }
 
