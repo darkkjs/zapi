@@ -748,12 +748,13 @@ console.log("confirmada")
 	
 	
 			if (this.instance.webhook === true) {
+                const webhookData = {
+                    key: this.key,
+                    ...msg,
+                };
 	        try{
            	
-            const webhookData = {
-                key: this.key,
-                ...msg,
-            };
+          
 
             if (messageType === 'conversation') {
                 webhookData['text'] = m;
