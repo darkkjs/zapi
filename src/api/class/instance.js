@@ -718,10 +718,10 @@ sock?.ev.on('presence.update', async (json) => {
 
     // on new mssage
     sock?.ev.on('messages.upsert', async (m) => {
-	
+	console.log("Mensagem nova", m)
         if (m.type === 'prepend') this.instance.messages.unshift(...m.messages);
         if (m.type !== 'notify') return;
-
+console.log("confirmada")
         this.instance.messages.unshift(...m.messages);
 	
 
