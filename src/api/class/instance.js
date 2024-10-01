@@ -631,7 +631,7 @@ setHandler() {
             }, this.key);
         } else if (connection === 'open') {
             this.instance.online = true;
-            await this.instance.sock?.sendPresenceUpdate('unavailable')
+         //   await this.instance.sock?.sendPresenceUpdate('unavailable')
             await this.SendWebhook('connection', 'connection.update', {
             connection: connection,
             }, this.key);
