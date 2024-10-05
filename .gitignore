@@ -12,3 +12,4 @@ sessiondata
 .idea
 
 db/sessions.js
+db
