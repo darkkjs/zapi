@@ -1,6 +1,13 @@
 /* eslint-disable no-unsafe-optional-chaining */
 const { WhatsAppInstance } = require('../class/instance')
-const logger = require('pino')()
+const logger = require('pino')({
+    level: process.env.LOG_LEVEL || 'info',
+    transport: {
+      target: 'pino-pretty'
+    },
+  });
+  
+  // Use logger.info(), logger.error(), etc. em vez de console.log()
 const config = require('../../config/config')
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 

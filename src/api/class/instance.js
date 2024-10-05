@@ -169,6 +169,27 @@ socketConfig = {
     },
 };
 
+
+startSessionUpdateInterval() {
+    this.updateInterval = setInterval(() => {
+      this.saveSessionState();
+    }, 5 * 60 * 1000); // Atualiza a cada 5 minutos
+  }
+  
+  async saveSessionState() {
+    // Salva o estado atual da sessão
+    const state = this.instance.sock?.authState.creds;
+    if (state) {
+      await this.authState.saveCreds(state);
+    }
+  }
+  
+  stopSessionUpdateInterval() {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+  }
+
 key = '';
 authState;
 allowWebhook = undefined;
@@ -639,6 +660,7 @@ setHandler() {
                 connection_code: lastDisconnect?.error?.output?.statusCode
             }, this.key);
         } else if (connection === 'open') {
+            console.log("ONLINE", this.instance)
             this.instance.online = true;
       await this.instance.sock?.sendPresenceUpdate('unavailable')
             await this.SendWebhook('connection', 'connection.update', {

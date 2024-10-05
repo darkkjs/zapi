@@ -11,4 +11,4 @@ sessiondata
 .vscode/settings.json
 .idea
 
-db
+db/sessions.js

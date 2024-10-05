@@ -1,6 +1,13 @@
 const dotenv = require('dotenv')
 //const mongoose = require('mongoose')
-const logger = require('pino')()
+const logger = require('pino')({
+    level: process.env.LOG_LEVEL || 'info',
+    transport: {
+      target: 'pino-pretty'
+    },
+  });
+  
+  // Use logger.info(), logger.error(), etc. em vez de console.log()
 dotenv.config()
 
 const app = require('./config/express')
