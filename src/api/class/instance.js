@@ -763,7 +763,7 @@ console.log("confirmada")
             if (msg.messageStubType) {
                 console.log("Detectado messageStubType:", msg.messageStubType);
                 console.log("key:", msg.key);
-                console.log("Enviando mensagem vazia para inicializar a sessão");
+              
                 
                 try {
                     // Envia uma mensagem vazia para o remetente
@@ -771,13 +771,7 @@ console.log("confirmada")
                     console.log("Mensagem vazia enviada com sucesso");
 
                       // Tenta recuperar a mensagem da store
-                      const msg2 = await dados.loadMessage(msg.key.remoteJid, msg.key.id);
-
-                      console.log(msg2)
-                      if (msg2) {
-                          console.log("Mensagem recuperada:", msg2)
-                          // Processe a mensagem recuperada
-                      }
+                     
                 } catch (error) {
                     console.error("Erro ao enviar mensagem vazia:", error);
                 }
@@ -893,7 +887,7 @@ console.log("confirmada")
 			}
 
 				const webh = await this.SendWebhook('message', 'messages.upsert', webhookData, this.key);
-                console.log("webhook enviado", webh);
+                console.log("webhook enviado");
             }
 			catch(e)
 			{
@@ -943,7 +937,7 @@ console.log("confirmada")
 
     sock?.ev.on('groups.upsert', async (groupUpsert) => {
 	
-        console.log("Received groups.upsert event:", JSON.stringify(groupUpsert));
+     //   console.log("Received groups.upsert event:", JSON.stringify(groupUpsert));
     
         try {
             if (this.instance.webhook && this.instance.customWebhook) {
@@ -955,7 +949,7 @@ console.log("confirmada")
                     instanceKey: this.key
                 };
     
-                console.log("Attempting to send groups.upsert webhook:", JSON.stringify(webhookData));
+               // console.log("Attempting to send groups.upsert webhook:", JSON.stringify(webhookData));
     
                 try {
                     const response = await this.axiosInstance.post('', webhookData);
@@ -968,13 +962,13 @@ console.log("confirmada")
                     }
                 }
             } else {
-                console.log("Webhook is not enabled or URL is not set for groups.upsert");
+       //         console.log("Webhook is not enabled or URL is not set for groups.upsert");
             }
     
             await this.updateGroupData();
             GroupsMetaDados.flushAll();
         } catch (e) {
-            console.error("Error in groups.upsert handler:", e);
+        //    console.error("Error in groups.upsert handler:", e);
         }
     });
 
@@ -992,7 +986,7 @@ console.log("confirmada")
                     instanceKey: this.key
                 };
     
-                console.log("Attempting to send groups.update webhook:", JSON.stringify(webhookData));
+               // console.log("Attempting to send groups.update webhook:", JSON.stringify(webhookData));
     
                 try {
                     const response = await this.axiosInstance.post('', webhookData);
@@ -1005,7 +999,7 @@ console.log("confirmada")
                     }
                 }
             } else {
-                console.log("Webhook is not enabled or URL is not set for groups.update");
+              //  console.log("Webhook is not enabled or URL is not set for groups.update");
             }
     
             await this.updateGroupData();
